@@ -1,0 +1,341 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  Business
+  JuniorPro
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String?  @map("password_hash")
+  role          UserRole
+  name          String
+  avatarUrl     String?  @map("avatar_url")
+  bio           String?
+  website       String?
+  portfolioUrl  String?  @map("portfolio_url")
+  bannerColor   String?  @map("banner_color")
+  walletBalance Decimal  @default(0) @map("wallet_balance")
+  score         Decimal  @default(0)
+  rating        Decimal  @default(0)
+  skills        String[] @default([])
+
+  // Business-specific fields
+  cin                String?
+  gstin              String?
+  yearEstablished    String?  @map("year_established")
+  industry           String?
+  officialEmail      String?  @map("official_email")
+  contactPhone       String?  @map("contact_phone")
+  address            String?
+  companyDescription String?  @map("company_description")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  catalogItems         BusinessCatalog[]
+  marketplaceListings  MarketplaceListing[]
+  negotiationsAsBuyer  Negotiation[]        @relation("BuyerNegotiations")
+  negotiationsAsSeller Negotiation[]        @relation("SellerNegotiations")
+  reviewsGiven         Review[]             @relation("ReviewsGiven")
+  reviewsReceived      Review[]             @relation("ReviewsReceived")
+  bountiesCreated      Bounty[]             @relation("BountiesCreated")
+  bountiesClaimed      Bounty[]             @relation("BountiesClaimed")
+  bidsPlaced           Bid[]                @relation("BidsPlaced")
+  bountyFeedbackSent   BountyFeedback[]     @relation("BountyFeedbackSent")
+
+  // Chat relations
+  chatsAsFounder       ChatConversation[]   @relation("ChatFounder")
+  chatsAsJuniorPro     ChatConversation[]   @relation("ChatJuniorPro")
+  chatMessagesSent     ChatMessage[]        @relation("ChatMessagesSent")
+
+  // Feed relations
+  feedPosts            FeedPost[]           @relation("FeedPosts")
+  feedReplies          FeedReply[]          @relation("FeedReplies")
+  postLikes            PostLike[]           @relation("PostLikes")
+
+  @@map("users")
+}
+
+// ===================== B2B CATALOG & MARKETPLACE =====================
+
+enum CatalogStatus {
+  IN_STOCK
+  OUT_OF_STOCK
+}
+
+enum ListingStatus {
+  ACTIVE
+  SOLD_OUT
+  PAUSED
+}
+
+enum NegotiationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COUNTERED
+}
+
+model BusinessCatalog {
+  id           String        @id @default(uuid())
+  sellerId     String        @map("seller_id")
+  itemName     String        @map("item_name")
+  bulkQuantity String        @map("bulk_quantity")
+  pricePerUnit Decimal       @map("price_per_unit")
+  status       CatalogStatus @default(IN_STOCK)
+
+  seller User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("business_catalog")
+}
+
+model MarketplaceListing {
+  id                  String        @id @default(uuid())
+  sellerId            String        @map("seller_id")
+  itemName            String        @map("item_name")
+  description         String        @default("")
+  category            String        @default("Other")
+  location            String        @default("")
+  bulkQuantity        String        @map("bulk_quantity")
+  minOrderQty         String        @default("1") @map("min_order_qty")
+  pricePerUnit        Decimal       @map("price_per_unit")
+  sellerContactConfig Json?         @map("seller_contact_config")
+  status              ListingStatus @default(ACTIVE)
+
+  seller       User          @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  negotiations Negotiation[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("marketplace_listings")
+}
+
+model Negotiation {
+  id              String            @id @default(uuid())
+  listingId       String            @map("listing_id")
+  fromBuyerId     String            @map("from_buyer_id")
+  toSellerId      String            @map("to_seller_id")
+  originalPrice   Decimal           @map("original_price")
+  offerPrice      Decimal           @map("offer_price")
+  quantity        String
+  message         String            @default("")
+  status          NegotiationStatus @default(PENDING)
+  counterResponse Json?             @map("counter_response")
+
+  listing MarketplaceListing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer   User               @relation("BuyerNegotiations", fields: [fromBuyerId], references: [id], onDelete: Cascade)
+  seller  User               @relation("SellerNegotiations", fields: [toSellerId], references: [id], onDelete: Cascade)
+  review  Review?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("negotiations")
+}
+
+// ===================== REVIEWS =====================
+
+model Review {
+  id             String  @id @default(uuid())
+  negotiationId  String  @unique @map("negotiation_id")
+  reviewerId     String  @map("reviewer_id")
+  revieweeId     String  @map("reviewee_id")
+  rating         Int
+  deliveredOnTime Boolean @map("delivered_on_time")
+  comment        String  @default("")
+
+  negotiation Negotiation @relation(fields: [negotiationId], references: [id], onDelete: Cascade)
+  reviewer    User        @relation("ReviewsGiven", fields: [reviewerId], references: [id], onDelete: Cascade)
+  reviewee    User        @relation("ReviewsReceived", fields: [revieweeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("reviews")
+}
+
+// ===================== BOUNTIES & TALENT BRIDGE =====================
+
+enum BountyStatus {
+  OPEN
+  BIDDING
+  IN_PROGRESS
+  REVIEW
+  REVISION_REQUESTED
+  COMPLETED
+}
+
+enum BidPocStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  SUBMITTED
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+model Bounty {
+  id                      String       @id @default(uuid())
+  founderId               String       @map("founder_id")
+  claimedById             String?      @map("claimed_by_id")
+  title                   String
+  description             String
+  category                String       @default("Miscellaneous")
+  price                   Decimal      @db.Decimal(12, 2)
+  deadline                DateTime?
+  status                  BountyStatus @default(OPEN)
+  tags                    String[]     @default([])
+  submissionLink          String?      @map("submission_link")
+  submissionScreenshotUrl String?      @map("submission_screenshot_url")
+  createdAt               DateTime     @default(now()) @map("created_at")
+  updatedAt               DateTime     @updatedAt @map("updated_at")
+
+  founder    User             @relation("BountiesCreated", fields: [founderId], references: [id], onDelete: Cascade)
+  claimedBy  User?            @relation("BountiesClaimed", fields: [claimedById], references: [id], onDelete: SetNull)
+  bids       Bid[]
+  milestones Milestone[]
+  feedbacks  BountyFeedback[]
+  chat       ChatConversation?
+
+  @@map("bounties")
+}
+
+model Bid {
+  id                         String        @id @default(uuid())
+  bountyId                   String        @map("bounty_id")
+  studentId                  String        @map("student_id")
+  bidPrice                   Decimal       @db.Decimal(12, 2)
+  message                    String        @default("")
+  counterOfferPrice          Decimal?      @map("counter_offer_price") @db.Decimal(12, 2)
+  counterOfferMessage        String?       @map("counter_offer_message")
+  pocRequested               Boolean       @default(false) @map("poc_requested")
+  pocStatus                  BidPocStatus? @map("poc_status")
+  pocSubmissionLink          String?       @map("poc_submission_link")
+  pocSubmissionScreenshotUrl String?       @map("poc_submission_screenshot_url")
+  createdAt                  DateTime      @default(now()) @map("created_at")
+
+  bounty  Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  student User   @relation("BidsPlaced", fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([bountyId, studentId])
+  @@map("bids")
+}
+
+model Milestone {
+  id          String          @id @default(uuid())
+  bountyId    String          @map("bounty_id")
+  title       String
+  description String          @default("")
+  status      MilestoneStatus @default(PENDING)
+  createdAt   DateTime        @default(now()) @map("created_at")
+  completedAt DateTime?       @map("completed_at")
+
+  bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+
+  @@map("milestones")
+}
+
+model BountyFeedback {
+  id            String   @id @default(uuid())
+  bountyId      String   @map("bounty_id")
+  senderId      String   @map("sender_id")
+  message       String   @default("")
+  screenshotUrl String?  @map("screenshot_url")
+  rating        Decimal? @db.Decimal(2, 1)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  bounty Bounty @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  sender User   @relation("BountyFeedbackSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("bounty_feedbacks")
+}
+
+// ===================== REAL-TIME MESSAGING =====================
+
+model ChatConversation {
+  id              String   @id @default(uuid())
+  bountyId        String   @unique @map("bounty_id")
+  founderId       String   @map("founder_id")
+  juniorProId     String   @map("junior_pro_id")
+  lastMessageTime DateTime @default(now()) @map("last_message_time")
+
+  bounty    Bounty        @relation(fields: [bountyId], references: [id], onDelete: Cascade)
+  founder   User          @relation("ChatFounder", fields: [founderId], references: [id], onDelete: Cascade)
+  juniorPro User          @relation("ChatJuniorPro", fields: [juniorProId], references: [id], onDelete: Cascade)
+  messages  ChatMessage[]
+
+  @@map("chat_conversations")
+}
+
+model ChatMessage {
+  id             String   @id @default(uuid())
+  conversationId String   @map("conversation_id")
+  senderId       String   @map("sender_id")
+  content        String
+  imageUrl       String?  @map("image_url")
+  timestamp      DateTime @default(now())
+
+  conversation ChatConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User             @relation("ChatMessagesSent", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+// ===================== SOCIAL FEED & INSIGHTS =====================
+
+model FeedPost {
+  id         String   @id @default(uuid())
+  authorId   String   @map("author_id")
+  content    String
+  tags       String[] @default([])
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  author  User        @relation("FeedPosts", fields: [authorId], references: [id], onDelete: Cascade)
+  replies FeedReply[]
+  likes   PostLike[]
+
+  @@map("feed_posts")
+}
+
+model FeedReply {
+  id         String   @id @default(uuid())
+  postId     String   @map("post_id")
+  authorId   String   @map("author_id")
+  content    String
+  likesCount Int      @default(0) @map("likes_count")
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  post   FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User     @relation("FeedReplies", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@map("feed_replies")
+}
+
+model PostLike {
+  userId String @map("user_id")
+  postId String @map("post_id")
+
+  user User     @relation("PostLikes", fields: [userId], references: [id], onDelete: Cascade)
+  post FeedPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@id([userId, postId])
+  @@map("post_likes")
+}

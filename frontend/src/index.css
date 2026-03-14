@@ -1,0 +1,379 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-oswald: "Oswald", sans-serif;
+  --font-jakarta: "Plus Jakarta Sans", sans-serif;
+  --font-inter: "Inter", sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Specific neon gamified colors (Ruvios Labs Inspired) */
+  --color-electric-lime: #D9F99D;
+  --color-cyber-pink: #F472B6;
+  --color-bright-cyan: #22D3EE;
+  --color-lime-accent: #A3E635;
+
+  /* Modnix Orange */
+  --color-modnix-orange: #E14425;
+
+  /* Specific soft pastel business colors */
+  --color-soft-mint: #d1fae5;
+  --color-pale-lavender: #e0e7ff;
+  --color-warm-peach: #ffedd5;
+}
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #09090b;
+    --card: #ffffff;
+    --card-foreground: #09090b;
+    --popover: #ffffff;
+    --popover-foreground: #09090b;
+    --primary: #18181b;
+    --primary-foreground: #fafafa;
+    --secondary: #f4f4f5;
+    --secondary-foreground: #18181b;
+    --muted: #f4f4f5;
+    --muted-foreground: #71717a;
+    --accent: #f4f4f5;
+    --accent-foreground: #18181b;
+    --destructive: #ef4444;
+    --destructive-foreground: #fafafa;
+    --border: #e4e4e7;
+    --input: #e4e4e7;
+    --ring: #18181b;
+  }
+
+  .theme-business {
+    --background: #E5E6E1;
+    --foreground: #0F172A;
+    --card: #FFFFFF;
+    --card-foreground: #0F172A;
+    --popover: #FFFFFF;
+    --popover-foreground: #0F172A;
+    --primary: #356DDA;
+    /* Blue */
+    --primary-foreground: #FFFFFF;
+    --secondary: #F1F5F9;
+    --secondary-foreground: #0F172A;
+    --muted: #F1F5F9;
+    --muted-foreground: #64748B;
+    --accent: #E5E7EB;
+    --accent-foreground: #0F172A;
+    --destructive: #EF4444;
+    --destructive-foreground: #ffffff;
+    --border: #D1D5DB;
+    --input: #D1D5DB;
+    --ring: #356DDA;
+  }
+
+  /* Coucher-inspired Dark Theme for Junior Pro Portal */
+  .theme-junior {
+    --background: #000000;
+    --foreground: #FFFFFF;
+    --card: #111111;
+    --border: #333333;
+
+    --color-background: #000000;
+    --color-foreground: #FFFFFF;
+    --color-card: #111111;
+    --color-card-foreground: #FFFFFF;
+    --color-popover: #000000;
+    --color-popover-foreground: #FFFFFF;
+    --color-primary: #FF5E00;
+    /* Coucher Vivid Orange */
+    --color-primary-foreground: #FFFFFF;
+    --color-secondary: #222222;
+    --color-secondary-foreground: #FFFFFF;
+    --color-muted: #1A1A1A;
+    --color-muted-foreground: #888888;
+    --color-accent: #B9A1E0;
+    /* Coucher Pastel Purple */
+    --color-accent-foreground: #000000;
+    --color-destructive: #FF4500;
+    --color-destructive-foreground: #ffffff;
+    --color-border: #333333;
+    --color-input: #333333;
+    --color-ring: #FF5E00;
+  }
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-inter);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Hide scrollbars globally */
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
+  * {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
+
+  .theme-business {
+    background-color: var(--background);
+    font-family: var(--font-inter);
+  }
+
+  .theme-junior {
+    background-color: var(--background);
+    font-family: var(--font-inter);
+    /* Body font for Junior Pro */
+  }
+
+  /* Modnix massive typography system */
+  h1,
+  .theme-junior h1,
+  .theme-junior .modnix-h1,
+  .theme-business h1 {
+    font-family: var(--font-oswald);
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.9;
+  }
+
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .theme-junior h2,
+  .theme-junior h3,
+  .theme-junior .modnix-h2,
+  .theme-business h2,
+  .theme-business h3 {
+    font-family: var(--font-jakarta);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+  }
+
+  /* Balanced typography for labels and small text */
+  .theme-junior .text-xs,
+  .theme-junior .text-sm {
+    font-family: var(--font-inter);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* Removed specific theme-business h1-h3 overrides as they are handled by global rules above */
+
+  /* Component Overrides per theme */
+
+  /* Business Theme Cards — clean bento style */
+  .theme-business .card,
+  .theme-business [data-slot="card"] {
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.04), 0px 1px 2px rgba(0, 0, 0, 0.02) !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    background-color: #FFFFFF !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .theme-business .card:hover,
+  .theme-business [data-slot="card"]:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.06) !important;
+    transform: translateY(-1px);
+  }
+
+  /* Junior Pro Theme (Modnix) Cards - sharper, sometimes no shadow */
+  .theme-junior .card,
+  .theme-junior [data-slot="card"] {
+    border-radius: 16px !important;
+    border: 1px solid var(--border) !important;
+    background-color: var(--card) !important;
+    box-shadow: none !important;
+  }
+
+  /* Global Button Pill Overrides */
+  button,
+  [role="button"],
+  .inline-flex.items-center.justify-center {
+    border-radius: 9999px !important;
+    /* Force pill shapes universally */
+    font-family: inherit;
+  }
+
+  .theme-junior button,
+  .theme-junior [role="button"] {
+    font-family: var(--font-jakarta);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Generic form inputs rounding (excludes .force-rectangle overrides) */
+  input:not(.force-rectangle),
+  select:not(.force-rectangle),
+  textarea:not(.force-rectangle) {
+    border-radius: 12px !important;
+    /* Rounded inputs like Job Portal popups */
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  .theme-business input,
+  .theme-business select,
+  .theme-business textarea {
+    border-radius: 12px !important;
+    /* Standardized to match */
+  }
+
+  /* Marquee animation */
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-marquee {
+    animation: marquee 25s linear infinite;
+    display: inline-block;
+    white-space: nowrap;
+  }
+
+  /* Modnix specific layout utilities */
+  .modnix-pill-image {
+    border-radius: 100px;
+    overflow: hidden;
+  }
+}
+
+/* Ultimate unlayered overrides for components that need strict rectangular forcing */
+.force-rectangle {
+  border-radius: 12px !important;
+}
+
+textarea.force-rectangle {
+  border-radius: 12px !important;
+  min-height: 120px !important;
+  max-height: 120px !important;
+  overflow-y: auto !important;
+}
+
+/* ─── Chat System Styles ─── */
+
+/* Message appear animation */
+@keyframes chatMsgAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-msg-appear {
+  animation: chatMsgAppear 0.25s ease-out;
+}
+
+/* Chat messages scroll area — show thin themed scrollbar */
+.chat-messages-scroll::-webkit-scrollbar {
+  display: block !important;
+  width: 4px;
+}
+
+.chat-messages-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Business theme scrollbar */
+.theme-business .chat-messages-scroll::-webkit-scrollbar-thumb {
+  background: rgba(53, 109, 218, 0.25);
+  border-radius: 4px;
+}
+.theme-business .chat-messages-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(53, 109, 218, 0.45);
+}
+
+/* Junior Pro theme scrollbar */
+.theme-junior .chat-messages-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+.theme-junior .chat-messages-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.chat-messages-scroll {
+  scrollbar-width: thin !important;
+  -ms-overflow-style: auto !important;
+}
+
+/* Chat container full height */
+.chat-container {
+  height: 100%;
+}
+
+.chat-list-panel {
+  height: 100%;
+}
+
+.chat-list-wrapper,
+.chat-area-wrapper {
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Override pill shapes for chat textarea */
+.chat-container textarea {
+  border-radius: 8px !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Override pill shapes for chat input area container */
+.chat-container input[type="text"],
+.chat-container input[type="file"] {
+  border-radius: 8px !important;
+}
+
+/* Force rectangular shape on conversation selector buttons */
+.chat-conv-btn {
+  border-radius: 0 !important;
+}
+
+/* Force rectangular shape on role badge */
+.chat-role-badge {
+  border-radius: 8px !important;
+}
+
+/* Unread badge — small rectangle */
+.chat-unread-badge {
+  border-radius: 4px !important;
+}
