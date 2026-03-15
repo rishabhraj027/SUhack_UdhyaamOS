@@ -4,3 +4,7 @@ build/
 .env
 logs/
 uploads/
+
+# Windows Zone.Identifier metadata files
+*.Zone.Identifier
+*:Zone.Identifier
