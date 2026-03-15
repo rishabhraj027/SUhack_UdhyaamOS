@@ -3,7 +3,7 @@ import { useB2BStore } from "../../store/useB2BStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import {
     Plus, Package, PackageSearch, ArrowUpRight, ArrowDownRight, Search,
-    MapPin, Phone, Mail, MessageSquare, Send, Check, XCircle, X,
+    MapPin, Phone, Mail, Send, Check, XCircle, X,
     Trash2, ShoppingCart, Eye, Clock, ChevronRight, Star, TrendingUp,
     Briefcase, Shield, User, ThumbsUp, ThumbsDown, Award
 } from "lucide-react";
