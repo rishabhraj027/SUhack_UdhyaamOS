@@ -16,13 +16,10 @@ export async function uploadFile(req: Request, res: Response): Promise<void> {
     }
 
     const folder = (req.query.folder as string) || 'uploads';
-    const allowed = ['avatars', 'submissions', 'screenshots', 'uploads'];
-    if (!allowed.includes(folder)) {
-      res.status(400).json({ error: `Invalid folder. Use: ${allowed.join(', ')}` });
-      return;
-    }
+    // Allow dynamic folder names based on needs (avatars, submissions, documents, etc.)
+    const safeFolder = folder.replace(/[^a-zA-Z0-9_-]/g, '') || 'uploads';
 
-    const url = await uploadToS3(file.buffer, file.originalname, folder, file.mimetype);
+    const url = await uploadToS3(file.buffer, file.originalname, safeFolder, file.mimetype);
     res.json({ url });
   } catch (err) {
     console.error('[uploadFile]', err);
