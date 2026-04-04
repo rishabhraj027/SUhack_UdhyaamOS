@@ -297,6 +297,7 @@ export type CreateBountyPayload = {
     description: string;
     price: number;
     deadline: string;
+    category?: string;
     tags?: string[];
 };
 

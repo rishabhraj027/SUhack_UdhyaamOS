@@ -59,6 +59,7 @@ export const useBountyStore = create<BountyState>()((set) => ({
             set((state) => ({ bounties: [newBounty, ...state.bounties], isLoading: false }));
         } catch (err: unknown) {
             set({ error: err instanceof Error ? err.message : String(err), isLoading: false });
+            throw err;
         }
     },
 

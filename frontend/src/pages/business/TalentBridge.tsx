@@ -143,19 +143,23 @@ export default function TalentBridge() {
              return;
         }
 
-        await createNewBounty({
-            title,
-            description,
-            price: Number(price),
-            deadline: date.toISOString(),
-            category,
-        } as any);
+        try {
+            await createNewBounty({
+                title,
+                description,
+                price: Number(price),
+                deadline: date.toISOString(),
+                category,
+            });
 
-        setIsModalOpen(false);
-        setTitle("");
-        setDescription("");
-        setCategory("Miscellaneous");
-        setPrice("");
+            setIsModalOpen(false);
+            setTitle("");
+            setDescription("");
+            setCategory("Miscellaneous");
+            setPrice("");
+        } catch (err: any) {
+            alert(err?.response?.data?.error || err?.message || 'Failed to create bounty');
+        }
     };
 
     const handleRequestRevision = () => {
@@ -188,7 +192,7 @@ export default function TalentBridge() {
     };
 
     // Stats
-    const openCount = bounties.filter(b => b.status === "BIDDING").length;
+    const openCount = bounties.filter(b => b.status === "OPEN" || b.status === "BIDDING").length;
     const inProgressCount = bounties.filter(b => b.status === "IN_PROGRESS").length;
     const inReviewCount = bounties.filter(b => b.status === "REVIEW").length;
     const completedCount = bounties.filter(b => b.status === "COMPLETED").length;
@@ -197,7 +201,7 @@ export default function TalentBridge() {
     // Filtered bounties
     const filteredBounties = bounties.filter(b => {
         if (activeFilter === "ALL") return b.status !== "COMPLETED"; // don't show completed in ALL
-        if (activeFilter === "OPEN") return b.status === "BIDDING";
+        if (activeFilter === "OPEN") return b.status === "OPEN" || b.status === "BIDDING";
         if (activeFilter === "IN_PROGRESS") return b.status === "IN_PROGRESS";
         if (activeFilter === "REVIEW") return b.status === "REVIEW";
         if (activeFilter === "COMPLETED") return b.status === "COMPLETED";
